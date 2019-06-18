@@ -50,7 +50,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="aacstart"
+        android:onClick="aacrecordstart"
         android:layout_gravity="center_horizontal"
         android:text="录制PCM数据存为AAC文件_开始" />
 
@@ -58,7 +58,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:onClick="aacstop"
+        android:onClick="aacrecordstop"
         android:text="录制PCM数据存为AAC文件_结束" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="aacplaystart"
+        android:layout_gravity="center_horizontal"
+        android:text="播放AAC文件_开始" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="aacplaystop"
+        android:text="播放AAC文件_结束" />
 
 </LinearLayout>

@@ -22,7 +22,7 @@ public class AACCodecTester implements AACDecoder.OnAudioDecodedListener,
         mAudioPlayer = new AudioPlayer();
         mAudioEncoder = new AACEncoder();
         mAudioDecoder = new AACDecoder();
-        if (!mAudioEncoder.start() || !mAudioDecoder.start()) {
+        if (!mAudioEncoder.start() || !mAudioDecoder.start(null)) {
             return false;
         }
         mAudioEncoder.setOnAACEncodeListener(this);

@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class AACDecoder {
-
+    public static final int DEFAULT_BIT_RATE = 128 * 1024; //128kb //AAC-LC, 64 *1024 for AAC-HE
     private static final String DEFAULT_MIME_TYPE = "audio/mp4a-latm";
     private static final int DEFAULT_CHANNEL_NUM = 1;
     private static final int DEFAULT_SAMPLE_RATE = 44100;
@@ -39,18 +39,18 @@ public class AACDecoder {
         void onFrameDecoded(byte[] decoded, long presentationTimeUs);
     }
 
-    public boolean start() {
+    public boolean start(MediaFormat format) {
         if (isStart) {
             return true;
         }
         try {
+            if (format == null){//外部可自己定义MediaFormat，没定义则使用默认的
+                format = createMediaFormat();
+            }
             mMediaCodec = MediaCodec.createDecoderByType(DEFAULT_MIME_TYPE);
-            MediaFormat format = new MediaFormat();
-            format.setString(MediaFormat.KEY_MIME, DEFAULT_MIME_TYPE);
-            format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, DEFAULT_CHANNEL_NUM);
-            format.setInteger(MediaFormat.KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
-            format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-            format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, DEFAULT_MAX_BUFFER_SIZE);
+            if (mMediaCodec == null) {
+                throw new IllegalStateException("该设备不支持AAC解码器");
+            }
             mMediaCodec.configure(format, null, null, 0);
             mMediaCodec.start();
             isStart = true;
@@ -61,14 +61,33 @@ public class AACDecoder {
         return true;
     }
 
+    private MediaFormat createMediaFormat(){
+        MediaFormat format = new MediaFormat();
+        format.setString(MediaFormat.KEY_MIME, DEFAULT_MIME_TYPE);
+        format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, DEFAULT_CHANNEL_NUM);
+        format.setInteger(MediaFormat.KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, DEFAULT_BIT_RATE);
+        //用来标记AAC是否有adts头，1->有
+        format.setInteger(MediaFormat.KEY_IS_ADTS, 1);
+        //ByteBuffer key（暂时不了解该参数的含义，但必须设置）
+        byte[] data = new byte[]{(byte) 0x11, (byte) 0x90};
+        ByteBuffer csd_0 = ByteBuffer.wrap(data);
+        format.setByteBuffer("csd-0", csd_0);
+        format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
+        format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, DEFAULT_MAX_BUFFER_SIZE);
+        return format;
+    }
+
     public void close() {
         if (!isStart) {
             return;
         }
-        mMediaCodec.stop();
-        mMediaCodec.release();
-        mMediaCodec = null;
         isStart = false;
+        if (mMediaCodec!=null){
+            mMediaCodec.stop();
+            mMediaCodec.release();
+            mMediaCodec = null;
+        }
     }
 
     public void setOnAccDecodedListener(OnAudioDecodedListener listener) {
@@ -124,7 +143,7 @@ public class AACDecoder {
                 }
                 mMediaCodec.releaseOutputBuffer(outputBufferIndex, false);
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             t.printStackTrace();
         }
     }

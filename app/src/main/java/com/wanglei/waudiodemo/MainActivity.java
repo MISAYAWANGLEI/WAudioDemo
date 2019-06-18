@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.wanglei.waudiodemo.aac.AACFileCapture;
+import com.wanglei.waudiodemo.aac.AACFilePlay;
 import com.wanglei.waudiodemo.basic.AudioTest;
 import com.wanglei.waudiodemo.utils.FileUtils;
 import com.wanglei.waudiodemo.wav.WaveDecoder;
@@ -24,17 +25,19 @@ public class MainActivity extends AppCompatActivity {
     private WaveEncoder waveEncoder;
     private WaveDecoder waveDecoder;
     private AACFileCapture aacFileCapture;
+    private AACFilePlay aacFilePlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         aacFileCapture = new AACFileCapture();
+        aacFilePlay = new AACFilePlay();
         audioTest = new AudioTest();
         waveEncoder = new WaveEncoder();
         waveDecoder = new WaveDecoder();
         try {
-            waveEncoder.prepare(FileUtils.createWavFilePath());
+            waveEncoder.prepare(FileUtils.getWavFilePath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -73,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void wavplaystart(View view) {
-        waveDecoder.start(FileUtils.wavFilePath);
+        waveDecoder.start(FileUtils.getWavFilePlayPath());
     }
 
     public void wavplaystop(View view) {
@@ -86,12 +89,20 @@ public class MainActivity extends AppCompatActivity {
         PermissionGen.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
     }
 
-    public void aacstart(View view) {
-        aacFileCapture.start(FileUtils.createAACFilePath());
+    public void aacrecordstart(View view) {
+        aacFileCapture.start(FileUtils.getAACFilePath());
     }
 
-    public void aacstop(View view) {
+    public void aacrecordstop(View view) {
         aacFileCapture.stop();
+    }
+
+    public void aacplaystart(View view) {
+        aacFilePlay.start(FileUtils.getAACFilePlayPath());
+    }
+
+    public void aacplaystop(View view) {
+        aacFilePlay.stop();
     }
 
     @PermissionSuccess(requestCode = 100)
@@ -103,4 +114,5 @@ public class MainActivity extends AppCompatActivity {
     public void doFailSomething(){
         Toast.makeText(this, "PermissionFail", Toast.LENGTH_SHORT).show();
     }
+
 }
