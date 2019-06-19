@@ -18,6 +18,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -67,12 +68,6 @@ public class AACDecoder {
         format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, DEFAULT_CHANNEL_NUM);
         format.setInteger(MediaFormat.KEY_SAMPLE_RATE, DEFAULT_SAMPLE_RATE);
         format.setInteger(MediaFormat.KEY_BIT_RATE, DEFAULT_BIT_RATE);
-        //用来标记AAC是否有adts头，1->有
-        format.setInteger(MediaFormat.KEY_IS_ADTS, 1);
-        //ByteBuffer key（暂时不了解该参数的含义，但必须设置）
-        byte[] data = new byte[]{(byte) 0x11, (byte) 0x90};
-        ByteBuffer csd_0 = ByteBuffer.wrap(data);
-        format.setByteBuffer("csd-0", csd_0);
         format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
         format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, DEFAULT_MAX_BUFFER_SIZE);
         return format;
@@ -84,6 +79,7 @@ public class AACDecoder {
         }
         isStart = false;
         if (mMediaCodec!=null){
+            Log.d("WL", "decoder close");
             mMediaCodec.stop();
             mMediaCodec.release();
             mMediaCodec = null;
@@ -114,7 +110,8 @@ public class AACDecoder {
                      * Such data must be marked using the flag BUFFER_FLAG_CODEC_CONFIG in a call to queueInputBuffer.
                      */
                     mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
-                            input.length, System.nanoTime() / 1000L, MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
+                            input.length, System.nanoTime() / 1000L,
+                            MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
                     mIsFirstFrame = false;
                 } else {
                     mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
@@ -134,6 +131,7 @@ public class AACDecoder {
             ByteBuffer[] outputBuffers = mMediaCodec.getOutputBuffers();
             MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
             int outputBufferIndex = mMediaCodec.dequeueOutputBuffer(bufferInfo, 1000);
+            Log.d("WL", "outputBufferIndex " + outputBufferIndex);
             if (outputBufferIndex >= 0) {
                 ByteBuffer outputBuffer = outputBuffers[outputBufferIndex];
                 byte[] outData = new byte[bufferInfo.size];

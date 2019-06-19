@@ -2,6 +2,8 @@ package com.wanglei.waudiodemo.aac;
 
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.os.Looper;
+import android.util.Log;
 
 import com.wanglei.waudiodemo.basic.AudioCapture;
 import com.wanglei.waudiodemo.basic.AudioPlayer;
@@ -29,10 +31,10 @@ public class AACFilePlay implements AACDecoder.OnAudioDecodedListener{
     }
 
     public void start(String filePath) {
+        isStop = false;
         mAudioDecoder.setOnAccDecodedListener(this);
         initMediaExtractor(filePath);
         new Thread(mDecodeRenderRunnable).start();
-        new Thread(mRetriveDataRunnable).start();
         mAudioPlayer.startPlayer();
     }
 
@@ -51,7 +53,7 @@ public class AACFilePlay implements AACDecoder.OnAudioDecodedListener{
                 }
                 else if(mime.startsWith("audio/")) {
                     audioTrackIndex = i;
-                    mAudioDecoder.start(null);
+                    mAudioDecoder.start(format);
                 }
             }
             //设置选定音频，因为这里我们要读出音频数据来解码并播放
@@ -66,14 +68,15 @@ public class AACFilePlay implements AACDecoder.OnAudioDecodedListener{
         mAudioPlayer.stopPlayer();
     }
 
-    private Runnable mRetriveDataRunnable = new Runnable() {
-
-        ByteBuffer buffer = ByteBuffer.allocate(1024 * 8);
+    private Runnable mDecodeRenderRunnable = new Runnable() {
+        ByteBuffer buffer = ByteBuffer.allocate(1024 * 2);
         @Override
         public void run() {
             while (!isStop) {
+
                 buffer.clear();
                 int ret = mediaExtractor.readSampleData(buffer,0);
+                Log.d("WL", "ret " + ret);
                 if (ret < 0){
                     isStop = true;
                     break;
@@ -81,17 +84,10 @@ public class AACFilePlay implements AACDecoder.OnAudioDecodedListener{
                 //读取出的数据送入解码器解码
                 mAudioDecoder.decodeData(buffer.array());
                 mediaExtractor.advance();//移动到下一帧
-            }
-            mediaExtractor.release();//读取结束后，要记得释放资源
-        }
-    };
 
-    private Runnable mDecodeRenderRunnable = new Runnable() {
-        @Override
-        public void run() {
-            while (!isStop) {
                 mAudioDecoder.retrieveData();
             }
+            mediaExtractor.release();//读取结束后，要记得释放资源
             mAudioDecoder.close();
         }
     };
