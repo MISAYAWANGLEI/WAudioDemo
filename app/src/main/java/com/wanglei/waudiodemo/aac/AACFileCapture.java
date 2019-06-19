@@ -28,6 +28,7 @@ public class AACFileCapture implements AACEncoder.OnAACEncodeListener,
 
     public boolean start(String mFilePath) {
         createFile(mFilePath);
+        isStop = false;
         mAudioCapturer = new AudioCapture();
         mAudioEncoder = new AACEncoder();
         if (!mAudioEncoder.start()) {
