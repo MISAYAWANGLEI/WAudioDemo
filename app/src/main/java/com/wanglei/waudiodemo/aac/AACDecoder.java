@@ -20,6 +20,8 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
 
+import com.wanglei.waudiodemo.basic.AudioPlayer;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -90,7 +92,7 @@ public class AACDecoder {
         mAudioDecodedListener = listener;
     }
 
-    public synchronized void decodeData(byte[] input) {
+    public synchronized void decodeData(byte[] input,long presentationTimeUs) {
         if (!isStart) {
             return;
         }
@@ -110,12 +112,12 @@ public class AACDecoder {
                      * Such data must be marked using the flag BUFFER_FLAG_CODEC_CONFIG in a call to queueInputBuffer.
                      */
                     mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
-                            input.length, System.nanoTime() / 1000L,
+                            input.length, presentationTimeUs,
                             MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
                     mIsFirstFrame = false;
                 } else {
                     mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
-                            input.length, System.nanoTime() / 1000L, 0);
+                            input.length, presentationTimeUs, 0);
                 }
             }
         } catch (Throwable t) {
@@ -136,6 +138,7 @@ public class AACDecoder {
                 ByteBuffer outputBuffer = outputBuffers[outputBufferIndex];
                 byte[] outData = new byte[bufferInfo.size];
                 outputBuffer.get(outData);
+                outputBuffer.clear();
                 if (mAudioDecodedListener != null) {
                     mAudioDecodedListener.onFrameDecoded(outData, bufferInfo.presentationTimeUs);
                 }

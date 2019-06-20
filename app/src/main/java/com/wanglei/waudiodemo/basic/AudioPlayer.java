@@ -80,6 +80,11 @@ public class AudioPlayer {
     }
 
     public boolean play(byte[] audioData, int offsetInBytes, int sizeInBytes) {
+
+        if (mAudioTrack == null){
+            return false;
+        }
+
         if (!mIsPlayStarted) {
             Log.e(TAG, "Player not started !");
             return false;
