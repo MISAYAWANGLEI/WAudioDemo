@@ -62,14 +62,18 @@ public class AACFilePlay {
     }
 
     public void stop() {
-        isStop = true;
-        mediaExtractor.release();
-        mAudioPlayer.stopPlayer();
-        if (mMediaCodec != null) {
-            Log.d("WL", "decoder close");
-            mMediaCodec.stop();
-            mMediaCodec.release();
-            mMediaCodec = null;
+        try {
+            isStop = true;
+            mediaExtractor.release();
+            mAudioPlayer.stopPlayer();
+            if (mMediaCodec != null) {
+                Log.d("WL", "decoder close");
+                mMediaCodec.stop();
+                mMediaCodec.release();
+                mMediaCodec = null;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -78,52 +82,56 @@ public class AACFilePlay {
         @Override
         public void run() {
             while (!isStop) {
-                //读取音频文件数据送入解码器
-                ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
-                int inputBufferIndex = mMediaCodec.dequeueInputBuffer(1000);
-                if (inputBufferIndex >= 0) {
-                    ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
-                    inputBuffer.clear();
-                    int sampleSize = mediaExtractor.readSampleData(inputBuffer, 0);
-                    long presentationTimeUs = mediaExtractor.getSampleTime();
-                    Log.d("WL", "sampleSize " + sampleSize);
-                    if (sampleSize < 0) {
-                        isStop = true;
-                        break;
+                try {
+                    //读取音频文件数据送入解码器
+                    ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
+                    int inputBufferIndex = mMediaCodec.dequeueInputBuffer(1000);
+                    if (inputBufferIndex >= 0) {
+                        ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
+                        inputBuffer.clear();
+                        int sampleSize = mediaExtractor.readSampleData(inputBuffer, 0);
+                        long presentationTimeUs = mediaExtractor.getSampleTime();
+                        Log.d("WL", "sampleSize " + sampleSize);
+                        if (sampleSize < 0) {
+                            isStop = true;
+                            break;
+                        }
+                        if (mIsFirstFrame) {
+                            /**
+                             * Some formats, notably AAC audio and MPEG4, H.264 and H.265 video formats
+                             * require the actual data to be prefixed by a number of buffers containing
+                             * setup data, or codec specific data. When processing such compressed formats,
+                             * this data must be submitted to the codec after start() and before any frame data.
+                             * Such data must be marked using the flag BUFFER_FLAG_CODEC_CONFIG in a call to queueInputBuffer.
+                             */
+                            mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
+                                    sampleSize, presentationTimeUs,
+                                    MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
+                            mIsFirstFrame = false;
+                        } else {
+                            mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
+                                    sampleSize, presentationTimeUs, 0);
+                        }
+                        mediaExtractor.advance();//移动到下一帧
+                        //获取解码数据
+                        ByteBuffer[] outputBuffers = mMediaCodec.getOutputBuffers();
+                        MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+                        int outputBufferIndex = mMediaCodec.dequeueOutputBuffer(bufferInfo, 1000);
+                        Log.d("WL", "outputBufferIndex " + outputBufferIndex);
+                        if (outputBufferIndex >= 0) {
+                            ByteBuffer outputBuffer = outputBuffers[outputBufferIndex];
+                            outputBuffer.position(bufferInfo.offset);
+                            outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
+                            byte[] outData = new byte[bufferInfo.size];
+                            outputBuffer.get(outData);
+                            outputBuffer.clear();
+                            //播放
+                            mAudioPlayer.play(outData, 0, outData.length);
+                            mMediaCodec.releaseOutputBuffer(outputBufferIndex, false);
+                        }
                     }
-                    if (mIsFirstFrame) {
-                        /**
-                         * Some formats, notably AAC audio and MPEG4, H.264 and H.265 video formats
-                         * require the actual data to be prefixed by a number of buffers containing
-                         * setup data, or codec specific data. When processing such compressed formats,
-                         * this data must be submitted to the codec after start() and before any frame data.
-                         * Such data must be marked using the flag BUFFER_FLAG_CODEC_CONFIG in a call to queueInputBuffer.
-                         */
-                        mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
-                                sampleSize, presentationTimeUs,
-                                MediaCodec.BUFFER_FLAG_CODEC_CONFIG);
-                        mIsFirstFrame = false;
-                    } else {
-                        mMediaCodec.queueInputBuffer(inputBufferIndex, 0,
-                                sampleSize, presentationTimeUs, 0);
-                    }
-                    mediaExtractor.advance();//移动到下一帧
-                    //获取解码数据
-                    ByteBuffer[] outputBuffers = mMediaCodec.getOutputBuffers();
-                    MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
-                    int outputBufferIndex = mMediaCodec.dequeueOutputBuffer(bufferInfo, 1000);
-                    Log.d("WL", "outputBufferIndex " + outputBufferIndex);
-                    if (outputBufferIndex >= 0) {
-                        ByteBuffer outputBuffer = outputBuffers[outputBufferIndex];
-                        outputBuffer.position(bufferInfo.offset);
-                        outputBuffer.limit(bufferInfo.offset + bufferInfo.size);
-                        byte[] outData = new byte[bufferInfo.size];
-                        outputBuffer.get(outData);
-                        outputBuffer.clear();
-                        //播放
-                        mAudioPlayer.play(outData, 0, outData.length);
-                        mMediaCodec.releaseOutputBuffer(outputBufferIndex, false);
-                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
             stop();

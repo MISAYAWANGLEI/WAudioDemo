@@ -74,6 +74,7 @@ public class AudioPlayer {
         }
 
         mAudioTrack.release();
+        mAudioTrack = null;
         mIsPlayStarted = false;
 
         Log.i(TAG, "Stop audio player success !");
