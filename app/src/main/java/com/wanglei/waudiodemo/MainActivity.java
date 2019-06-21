@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.wanglei.waudiodemo.aac.AACFileCapture;
 import com.wanglei.waudiodemo.aac.AACFilePlay;
 import com.wanglei.waudiodemo.basic.AudioTest;
+import com.wanglei.waudiodemo.extractor.Muxer;
 import com.wanglei.waudiodemo.utils.FileUtils;
 import com.wanglei.waudiodemo.wav.WaveDecoder;
 import com.wanglei.waudiodemo.wav.WaveEncoder;
@@ -115,4 +116,25 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "PermissionFail", Toast.LENGTH_SHORT).show();
     }
 
+    //从mp4文件抽取出视频单独封装为两个mp4文件
+    public void audioExtractor(View view) {
+        final Muxer muxer = new Muxer();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                muxer.startMuxerAudio();
+            }
+        }).start();
+    }
+
+    //从mp4文件抽取出音频单独封装为两个mp4文件
+    public void videoExtractor(View view) {
+        final Muxer muxer = new Muxer();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                muxer.startMuxerVideo();
+            }
+        }).start();
+    }
 }

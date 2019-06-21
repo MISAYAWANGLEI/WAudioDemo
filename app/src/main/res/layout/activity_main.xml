@@ -1,78 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="start"
-        android:layout_gravity="center_horizontal"
-        android:text="开始音频的录制与播放" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="stop"
-        android:text="停止音频的录制与播放" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="start"
+            android:layout_gravity="center_horizontal"
+            android:text="开始音频的录制与播放" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="wavstart"
-        android:layout_gravity="center_horizontal"
-        android:text="录制PCM数据存为WAV文件_开始" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="stop"
+            android:text="停止音频的录制与播放" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="wavstop"
-        android:text="录制PCM数据存为WAV文件_结束" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="wavstart"
+            android:layout_gravity="center_horizontal"
+            android:text="录制PCM数据存为WAV文件_开始" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="wavplaystart"
-        android:layout_gravity="center_horizontal"
-        android:text="WAV文件播放_开始" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="wavstop"
+            android:text="录制PCM数据存为WAV文件_结束" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="wavplaystop"
-        android:text="WAV文件播放_结束" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="wavplaystart"
+            android:layout_gravity="center_horizontal"
+            android:text="WAV文件播放_开始" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="aacrecordstart"
-        android:layout_gravity="center_horizontal"
-        android:text="录制PCM数据存为AAC文件_开始" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="wavplaystop"
+            android:text="WAV文件播放_结束" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="aacrecordstop"
-        android:text="录制PCM数据存为AAC文件_结束" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="aacrecordstart"
+            android:layout_gravity="center_horizontal"
+            android:text="录制PCM数据存为AAC文件_开始" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="aacplaystart"
-        android:layout_gravity="center_horizontal"
-        android:text="播放AAC文件_开始" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="aacrecordstop"
+            android:text="录制PCM数据存为AAC文件_结束" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="aacplaystop"
-        android:text="播放AAC文件_结束" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="aacplaystart"
+            android:layout_gravity="center_horizontal"
+            android:text="播放AAC文件_开始" />
 
-</LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="aacplaystop"
+            android:text="播放AAC文件_结束" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="videoExtractor"
+            android:text="分离视频" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="audioExtractor"
+            android:text="分离音频" />
+
+    </LinearLayout>
+
+</ScrollView>
