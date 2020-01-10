@@ -1,6 +1,7 @@
 package com.wanglei.waudiodemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +11,7 @@ import com.wanglei.waudiodemo.aac.AACFileCapture;
 import com.wanglei.waudiodemo.aac.AACFilePlay;
 import com.wanglei.waudiodemo.basic.AudioTest;
 import com.wanglei.waudiodemo.extractor.Muxer;
+import com.wanglei.waudiodemo.meidarecord.AudioRecordAndPlayActivity;
 import com.wanglei.waudiodemo.utils.FileUtils;
 import com.wanglei.waudiodemo.wav.WaveDecoder;
 import com.wanglei.waudiodemo.wav.WaveEncoder;
@@ -136,5 +138,10 @@ public class MainActivity extends AppCompatActivity {
                 muxer.startMuxerVideo();
             }
         }).start();
+    }
+
+    public void mediaRecordAndPlay(View view) {
+        Intent intent = new Intent(this, AudioRecordAndPlayActivity.class);
+        startActivity(intent);
     }
 }

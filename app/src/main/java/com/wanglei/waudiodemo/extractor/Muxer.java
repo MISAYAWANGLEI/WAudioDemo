@@ -7,16 +7,13 @@ import android.media.MediaMuxer;
 import android.os.Environment;
 import android.util.Log;
 
-import com.wanglei.waudiodemo.utils.FileUtils;
-
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class Muxer {
 
-    private static final String SDCARD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() +
-            File.separator;
+    private static final String SDCARD_PATH = Environment.getExternalStorageDirectory().
+            getAbsolutePath() + File.separator;
     //输入文件路径 需要在手机SD卡提前有一个1.mp4文件
     private static final String INPUT_FILEPATH = SDCARD_PATH + "1.mp4";
     //输出音频文件路径
@@ -44,7 +41,8 @@ public class Muxer {
                         Log.i("WL","framerate ->"+framerate);
                         videoMuxer = new MediaMuxer(OUTPUT_VIDEO_FILEPATH,
                                 MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-                        /*这里有一个比较大的坑，就是，如果手动创建MediaFormat对象的话，一定要记得设置"csd-0"和"csd-1"这两个参数：
+                        /*这里有一个比较大的坑，就是，如果手动创建MediaFormat对象的话，
+                        一定要记得设置"csd-0"和"csd-1"这两个参数：
                         byte[] csd0 = {x,x,x,x,x,x,x...}
                         byte[] csd1 = {x,x,x,x,x,x,x...}
                         format.setByteBuffer("csd-0",ByteBuffer.wrap(csd0));

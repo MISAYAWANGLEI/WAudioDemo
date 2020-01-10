@@ -94,6 +94,13 @@
             android:onClick="audioExtractor"
             android:text="分离音频" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="mediaRecordAndPlay"
+            android:text="MediaRecordAndPlay" />
+
     </LinearLayout>
 
 </ScrollView>
